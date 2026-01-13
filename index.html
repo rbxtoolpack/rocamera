@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-color: #121212;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    button {
+      background-color: #242424;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 16px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    input[type="number"] {
+      background: #1e1e1e;
+      color: white;
+      border: 1px solid #333;
+      padding: 8px 12px;
+      border-radius: 8px;
+      width: 100px;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 900px;
+      height: 220px;
+      background: #1e1e1e;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 12px;
+      resize: vertical;
+    }
+
+    img {
+      max-width: 300px;
+      border-radius: 16px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    Size:
+    <input id="sizeInput" type="number" value="200" min="1">
+  </div>
+
+  <button onclick="fileInput.click()">Import</button>
+  <input id="fileInput" type="file" accept=".png,.jpg,.jpeg">
+
+  <img id="preview">
+
+  <textarea id="outputBox" placeholder="Output will appear here"></textarea>
+
+  <script>
+  fileInput.onchange = () => {
+    const file = fileInput.files[0]
+    if (!file) return
+
+    const size = parseInt(sizeInput.value) || 200
+
+    const img = new Image()
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      img.src = reader.result
+    }
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas")
+      canvas.width = size
+      canvas.height = size
+      const ctx = canvas.getContext("2d")
+
+      ctx.drawImage(img, 0, 0, size, size)
+
+      preview.src = canvas.toDataURL()
+      preview.style.display = "block"
+
+      const data = ctx.getImageData(0, 0, size, size).data
+      let output = "["
+      const total = size * size
+      let count = 0
+
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const i = (y * size + x) * 4
+          const r = data[i]
+          const g = data[i + 1]
+          const b = data[i + 2]
+
+          count++
+          output += "[" + r + "," + g + "," + b + "]"
+          if (count < total) output += ","
+        }
+      }
+
+      output += "]"
+      outputBox.value = output
+    }
+
+    reader.readAsDataURL(file)
+  }
+</script>
+
+</body>
+</html>
