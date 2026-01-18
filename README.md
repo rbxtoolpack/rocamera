@@ -1,2 +1,3 @@
-# rocamera.github.io
-be able to turn an image into paint code
+# ROCAMERA
+
+Turns images into paint code, only useful if you have the gatekeeper ui.
